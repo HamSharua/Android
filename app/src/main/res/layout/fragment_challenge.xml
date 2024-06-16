@@ -7,16 +7,16 @@
     android:layout_height="match_parent"
     tools:context=".ui.challenge.ChallengeFragment">
 
-    <TextView
-        android:id="@+id/textChallenge"
+    <Button
+        android:id="@+id/btn_challenge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello Challenge!"
-        android:textSize="18sp"
-        android:textStyle="bold"
+        android:text="チャレンジ！"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
