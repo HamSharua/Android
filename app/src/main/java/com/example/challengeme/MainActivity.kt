@@ -21,6 +21,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomNavigationView1: BottomNavigationView
     private lateinit var bottomNavigationView2: BottomNavigationView
     private lateinit var bottomNavigationView3: BottomNavigationView
+    private lateinit var bottomNavigationViewList: List<BottomNavigationView>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,37 +61,36 @@ class MainActivity : AppCompatActivity() {
         topRightNavView.setupWithNavController(navController)
 
 //        ナビを消す
-//        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.top_left_nav_view)
-        bottomNavigationView1 = findViewById(R.id.top_left_nav_view)
-        bottomNavigationView2 = findViewById(R.id.top_right_nav_view)
-        bottomNavigationView3 = findViewById(R.id.nav_view)
-
+       // 各 BottomNavigationView をリストで管理する
+        bottomNavigationViewList = listOf(
+            findViewById(R.id.top_left_nav_view),
+            findViewById(R.id.top_right_nav_view),
+            findViewById(R.id.nav_view)
+        )
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
         val navController2 = navHostFragment.navController
 
-        // 各 BottomNavigationView を対応する NavController と紐づける
-        bottomNavigationView1.setupWithNavController(navController2)
-        bottomNavigationView2.setupWithNavController(navController2)
-        bottomNavigationView3.setupWithNavController(navController2)
+        // 各 BottomNavigationView を対応する NavController2 と紐づける
+        bottomNavigationViewList.forEach { bottomNavigationView ->
+            bottomNavigationView.setupWithNavController(navController2)
+        }
 
-//        val navHostFragment = supportFragmentManager
-//            .findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
-//        val navController2 = navHostFragment.navController
-//
-//        bottomNavigationView.setupWithNavController(navController2)
-//
-//        navController2.addOnDestinationChangedListener { _, destination, _ ->
-//            when (destination.id) {
-//                R.id.challengeCameraFragment -> bottomNavigationView.visibility = View.GONE
-//                else -> bottomNavigationView.visibility = View.VISIBLE
-//            }
-//        }
-        navController2.addOnDestinationChangedListener { _, destination, _ ->
+//        ChallengeCamera画面ではナビを非表示にする
+        navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.challengeCameraFragment -> bottomNavigationView1.visibility = View.GONE
-                else -> bottomNavigationView1.visibility = View.VISIBLE
+                R.id.challengeCameraFragment -> {
+                    bottomNavigationViewList.forEach { bottomNavigationView ->
+                        bottomNavigationView.visibility = View.GONE
+                    }
+                }
+                else -> {
+                    bottomNavigationViewList.forEach { bottomNavigationView ->
+                        bottomNavigationView.visibility = View.VISIBLE
+                    }
+                }
             }
         }
+
     }
 }
