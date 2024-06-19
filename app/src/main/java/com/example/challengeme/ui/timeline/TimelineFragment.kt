@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.challengeme.databinding.FragmentTimelineBinding
 
 class TimelineFragment : Fragment() {
@@ -23,14 +22,14 @@ class TimelineFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val timelineViewModel =
+        val notificationsViewModel =
             ViewModelProvider(this).get(TimelineViewModel::class.java)
 
         _binding = FragmentTimelineBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         val textView: TextView = binding.textTimeline
-        timelineViewModel.text.observe(viewLifecycleOwner) {
+        notificationsViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
         return root
@@ -41,4 +40,3 @@ class TimelineFragment : Fragment() {
         _binding = null
     }
 }
-

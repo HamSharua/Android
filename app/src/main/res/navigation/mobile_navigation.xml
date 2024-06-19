@@ -41,6 +41,13 @@
 
     <fragment
         android:id="@+id/challengeCameraFragment"
-        android:name="com.example.app.ChallengeCameraFragment"
-        tools:layout="@layout/fragment_challenge_camera" />
+        android:name="com.example.challengeme.ui.challengecamera.ChallengeCameraFragment">
+        <action
+            android:id="@+id/action_challengeCameraFragment_to_timelineFragment"
+            app:destination="@id/timelineFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/timelineFragment"
+        android:name="com.example.challengeme.ui.timeline.TimelineFragment"/>
 </navigation>
