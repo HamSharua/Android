@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.challengeme.R
 
+
 class ChallengeCameraFragment : Fragment() {
 
     override fun onCreateView(

@@ -8,10 +8,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.challengeme.data.ChallengeContract
-import com.example.challengeme.data.ChallengeDbHelper
-import java.text.SimpleDateFormat
-import java.util.*
+//import com.example.challengeme.data.ChallengeContract
+//import com.example.challengeme.data.ChallengeDbHelper
+//import java.text.SimpleDateFormat
+//import java.util.*
 class TimelineViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
