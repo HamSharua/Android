@@ -7,6 +7,47 @@
     android:layout_height="match_parent"
     android:paddingTop="?attr/actionBarSize">
 
+    <!-- 上部のナビゲーションビュー -->
+    <LinearLayout
+        android:id="@+id/top_nav_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/top_left_nav_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:menu="@menu/top_left_nav_menu"
+            tools:ignore="MissingConstraints" />
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/top_right_nav_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:menu="@menu/top_right_nav_menu"
+            tools:ignore="MissingConstraints" />
+    </LinearLayout>
+
+    <!-- フラグメントホスト -->
+    <fragment
+        android:id="@+id/nav_host_fragment_activity_main"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:defaultNavHost="true"
+        app:layout_constraintTop_toBottomOf="@id/top_nav_container"
+        app:layout_constraintBottom_toTopOf="@id/nav_view"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:navGraph="@navigation/mobile_navigation" />
+
+    <!-- 下部のナビゲーションビュー -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/nav_view"
         android:layout_width="0dp"
@@ -18,46 +59,5 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:menu="@menu/bottom_nav_menu" />
-
-    <!-- 上部の左に配置されるナビゲーションビュー -->
-
-    <!-- 上部の右に配置されるナビゲーションビュー -->
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/top_left_nav_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/top_left_nav_menu"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteY="0dp" />
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/top_right_nav_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:menu="@menu/top_right_nav_menu"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteY="0dp" />
-
-    <fragment
-        android:id="@+id/nav_host_fragment_activity_main"
-        android:name="androidx.navigation.fragment.NavHostFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@id/nav_view"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.714"
-        app:navGraph="@navigation/mobile_navigation" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -39,16 +39,29 @@
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
 
+    <!--    <fragment-->
+    <!--        android:id="@+id/challengeCameraFragment"-->
+    <!--        android:name="com.example.challengeme.ui.challengecamera.ChallengeCameraFragment"-->
+    <!--        tools:layout="@layout/fragment_challenge_camera">-->
+    <!--        <action-->
+    <!--            android:id="@+id/action_challengeCameraFragment_to_photoPreviewFragment"-->
+    <!--            app:destination="@id/photoPreviewFragment">-->
+    <!--            <argument-->
+    <!--                android:name="photoPath"-->
+    <!--                app:argType="string" />-->
+    <!--        </action>-->
+    <!--    </fragment>-->
     <fragment
         android:id="@+id/challengeCameraFragment"
         android:name="com.example.challengeme.ui.challengecamera.ChallengeCameraFragment"
-        tools:layout="@layout/fragment_challenge_camera">
+        android:label="ChallengeCameraFragment">
         <action
             android:id="@+id/action_challengeCameraFragment_to_photoPreviewFragment"
             app:destination="@id/photoPreviewFragment">
             <argument
                 android:name="photoPath"
-                app:argType="string" />
+                app:argType="string"
+                app:nullable="false" />
         </action>
     </fragment>
 
@@ -56,13 +69,22 @@
         android:id="@+id/timelineFragment"
         android:name="com.example.challengeme.ui.timeline.TimelineFragment"/>
 
+    <!--    <fragment-->
+    <!--        android:id="@+id/photoPreviewFragment"-->
+    <!--        android:name="com.example.challengeme.ui.challengecamera.PhotoPreviewFragment"-->
+    <!--        android:label="photo_preview_fragment"-->
+    <!--        tools:layout="@layout/fragment_photo_preview"/>-->
+    <!--    <action-->
+    <!--        android:id="@+id/action_photoPreviewFragment_to_challengeCameraFragment"-->
+    <!--        app:destination="@id/challengeCameraFragment" />-->
+
     <fragment
         android:id="@+id/photoPreviewFragment"
         android:name="com.example.challengeme.ui.challengecamera.PhotoPreviewFragment"
-        android:label="photo_preview_fragment"
-        tools:layout="@layout/fragment_photo_preview"/>
-    <action
-        android:id="@+id/action_photoPreviewFragment_to_challengeCameraFragment"
-        app:destination="@id/challengeCameraFragment" />
-
+        android:label="PhotoPreviewFragment">
+        <argument
+            android:name="photoPath"
+            app:argType="string"
+            app:nullable="false" />
+    </fragment>
 </navigation>
