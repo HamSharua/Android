@@ -7,4 +7,7 @@
     <string name="title_profile">profile</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="capture_button" />
+    <string name="photo_view">Photo View</string>
+    <string name="retake_photo">Retake Photo</string>
 </resources>

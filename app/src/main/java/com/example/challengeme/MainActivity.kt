@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         topRightNavView.setupWithNavController(navController)
 
 //        ナビを消す
-       // 各 BottomNavigationView をリストで管理する
+        // 各 BottomNavigationView をリストで管理する
         bottomNavigationViewList = listOf(
             findViewById(R.id.top_left_nav_view),
             findViewById(R.id.top_right_nav_view),

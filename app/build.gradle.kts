@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -39,6 +40,15 @@ android {
 }
 
 dependencies {
+    val camerax_version = "1.1.0"
+    implementation("androidx.camera:camera-core:$camerax_version")
+    implementation("androidx.camera:camera-camera2:$camerax_version")
+    implementation("androidx.camera:camera-lifecycle:$camerax_version")
+    implementation("androidx.camera:camera-view:$camerax_version")
+    implementation("androidx.camera:camera-extensions:$camerax_version")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
+    implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.21")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

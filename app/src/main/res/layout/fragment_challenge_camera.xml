@@ -1,35 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    tools:context=".ui.challengecamera.ChallengeCameraFragment">
 
-    <ImageView
-        android:id="@+id/photoImageView"
+    <androidx.camera.view.PreviewView
+        android:id="@+id/viewFinder"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:scaleType="centerCrop"
-        android:background="#E0E0E0"
-        android:layout_marginBottom="16dp"/>
+        android:layout_height="match_parent"
+        android:layout_gravity="center" />
 
-    <EditText
-        android:id="@+id/commentEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="コメントを入力"
-        android:layout_marginBottom="16dp"/>
-
-    <Button
+    <ImageButton
         android:id="@+id/captureButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="写真を撮る"
-        android:layout_marginBottom="16dp"/>
-
-    <Button
-        android:id="@+id/saveButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="保存する"/>
-</LinearLayout>
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="16dp"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_menu_camera"
+        android:contentDescription="@string/capture_button" />
+</FrameLayout>
