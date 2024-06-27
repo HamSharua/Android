@@ -10,6 +10,9 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.challengeme.databinding.FragmentCalenderBinding
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class CalenderFragment : Fragment() {
 
@@ -35,7 +38,10 @@ class CalenderFragment : Fragment() {
         // カレンダーの日付変更リスナーを設定
         calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
             // 日付が変更されたときの処理
-            val date = "$dayOfMonth/${month+1}/$year"
+            val calendar = Calendar.getInstance()
+            calendar.set(year, month, dayOfMonth)
+            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.JAPAN)
+            val date = dateFormat.format(calendar.time)
             calenderViewModel.setSelectedDate(date)
             // 選択された日付に対応するメモを表示
             editTextNote.setText(calenderViewModel.getNoteForDate(date))
