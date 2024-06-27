@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.Button
+import android.widget.CalendarView
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.challengeme.databinding.FragmentCalenderBinding
@@ -12,26 +14,42 @@ import com.example.challengeme.databinding.FragmentCalenderBinding
 class CalenderFragment : Fragment() {
 
     private var _binding: FragmentCalenderBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
+    private lateinit var calenderViewModel: CalenderViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val notificationsViewModel =
+        calenderViewModel =
             ViewModelProvider(this).get(CalenderViewModel::class.java)
 
         _binding = FragmentCalenderBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textCalender
-        notificationsViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        val calendarView: CalendarView = binding.calendarView
+        val editTextNote: EditText = binding.editTextNote
+        val buttonSaveNote: Button = binding.buttonSaveNote
+
+        // カレンダーの日付変更リスナーを設定
+        calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
+            // 日付が変更されたときの処理
+            val date = "$dayOfMonth/${month+1}/$year"
+            calenderViewModel.setSelectedDate(date)
+            // 選択された日付に対応するメモを表示
+            editTextNote.setText(calenderViewModel.getNoteForDate(date))
         }
+
+        // ボタンのクリックリスナーを設定
+        buttonSaveNote.setOnClickListener {
+            val note = editTextNote.text.toString()
+            val selectedDate = calenderViewModel.selectedDate.value
+            if (selectedDate != null) {
+                calenderViewModel.saveNoteForDate(selectedDate, note)
+            }
+        }
+
         return root
     }
 
