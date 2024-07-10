@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -16,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.challengeme.R
 import com.example.challengeme.databinding.FragmentChallengeCameraBinding
 import java.io.File
+import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -110,6 +112,10 @@ class ChallengeCameraFragment : Fragment() {
                 // パーミッションが拒否された場合の処理をここに書く
             }
         }
+    }
+
+    private fun ImageView.setImageURI(toURI: URI) {
+        this.setImageURI(android.net.Uri.parse(toURI.toString()))
     }
 
     override fun onDestroyView() {

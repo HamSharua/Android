@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "622492550816",
+    "project_id": "challengeme-56fd7",
+    "storage_bucket": "challengeme-56fd7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:622492550816:android:4426d4d6af3f469509ebc5",
+        "android_client_info": {
+          "package_name": "com.example.challengeme"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_P4iDVAATHCKJKRgQrreewo3dmHG5WBI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
