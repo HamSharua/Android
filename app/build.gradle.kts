@@ -78,4 +78,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // Picassoの依存関係を追加
+    implementation("com.squareup.picasso:picasso:2.71828")
 }
