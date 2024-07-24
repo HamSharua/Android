@@ -57,6 +57,7 @@ dependencies {
 
     // Add the dependency for the Firebase SDK for Google Analytics
     implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-storage")
 
     // Add the dependencies for any other Firebase products you want to use
     implementation("com.google.firebase:firebase-auth-ktx")
@@ -65,6 +66,10 @@ dependencies {
 
     // Ensure Google Play services dependencies are consistent with Firebase
     implementation("com.google.android.gms:play-services-measurement-api")
+
+    implementation("com.google.firebase:firebase-firestore-ktx:24.3.0")
+    implementation("com.github.bumptech.glide:glide:4.12.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
