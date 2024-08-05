@@ -81,7 +81,7 @@ class PhotoPreviewFragment : Fragment() {
             "datetime" to Date(),
             "image" to imageUrl,
             "timeline_id" to UUID.randomUUID().toString(),
-            "user_id" to 1
+            "user_id" to "1"
         )
 
         db.collection("timeline")
