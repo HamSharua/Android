@@ -28,6 +28,7 @@ class TimelineAdapter(private val timelineItems: List<TimelineItem>) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(timelineItem: TimelineItem) {
+            binding.textViewUserId.text = timelineItem.user_id
             binding.textViewComment.text = timelineItem.comment
             Glide.with(binding.imageView.context)
                 .load(timelineItem.image)
