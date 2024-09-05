@@ -1,52 +1,142 @@
 package com.example.challengeme.ui.profile
 
+import android.app.AlertDialog
+import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
+import com.bumptech.glide.Glide
+import com.example.challengeme.LoginActivity
 import com.example.challengeme.R
+import com.example.challengeme.RegisterActivity
 import com.example.challengeme.databinding.FragmentProfileBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var firestore: FirebaseFirestore
+
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val profileViewModel =
-            ViewModelProvider(this).get(ProfileViewModel::class.java)
-
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val profileImage: ImageView = binding.profileImage
-        val editUsername: EditText = binding.editUsername
-        val editEmail: EditText = binding.editEmail
-        val buttonSave: Button = binding.buttonSave
+        firebaseAuth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
 
-        profileViewModel.text.observe(viewLifecycleOwner) {
-            // Optional: Update UI with ViewModel data if needed
-        }
+        val currentUser = firebaseAuth.currentUser
 
-        buttonSave.setOnClickListener {
-            val username = editUsername.text.toString()
-            val email = editEmail.text.toString()
+        if (currentUser != null) {
+            // ログインしている場合、Firestoreからユーザーデータを取得
+            val userId = currentUser.uid
+            firestore.collection("users").document(userId).get().addOnSuccessListener { document ->
+                if (document != null) {
+                    val userName = document.getString("user_name") ?: "N/A"
+                    val userEmail = document.getString("user_address") ?: "N/A"
+                    val userIconUrl = document.getString("user_icon")
 
-            // Save the data (implement the saving logic here)
-            // For now, we'll just show a Toast as a placeholder
-            // Toast.makeText(context, "Saved: $username, $email", Toast.LENGTH_SHORT).show()
+                    // プロフィールの各項目にデータを設定
+                    binding.usernameTextView.text = userName
+                    binding.emailTextView.text = userEmail
+                    binding.passwordTextView.text = "********"  // パスワードは非表示で固定
+
+                    // Glideでアイコンを円形に表示
+                    userIconUrl?.let {
+                        Glide.with(this)
+                            .load(it)
+                            .circleCrop()
+                            .into(binding.profileImageView)
+                    }
+
+                    // アイコンをクリックしたらポップアップで全体表示
+                    binding.profileImageView.setOnClickListener {
+                        showIconPopup(userIconUrl)
+                    }
+                }
+            }.addOnFailureListener { e ->
+                Toast.makeText(context, "データの取得に失敗しました: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+
+            // ログインしている場合、ログアウトボタンを表示
+            binding.logoutButton.visibility = View.VISIBLE
+            binding.buttonRegister.visibility = View.GONE  // ログインしている時は新規登録ボタンを非表示
+
+            // ログアウトボタンの動作設定
+            binding.logoutButton.setOnClickListener {
+                FirebaseAuth.getInstance().signOut()
+                Toast.makeText(context, "ログアウトしました", Toast.LENGTH_SHORT).show()
+
+                // ログアウト後に画面を更新
+                requireActivity().recreate()
+            }
+
+        } else {
+            // ログインしていない場合はダイアログを表示
+            showLoginDialog()
         }
 
         return root
+    }
+
+    // アイコンのポップアップ表示
+    private fun showIconPopup(imageUrl: String?) {
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.dialog_image_popup)
+        val popupImageView = dialog.findViewById<ImageView>(R.id.popupImageView)
+
+        // Glideで画像をロード
+        imageUrl?.let {
+            Glide.with(this).load(it).into(popupImageView)
+        }
+
+        popupImageView.setOnClickListener {
+            dialog.dismiss()  // ポップアップを閉じる
+        }
+
+        dialog.show()
+    }
+
+    // ログインが必要な場合のダイアログ表示
+    private fun showLoginDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("ログインする必要があります")
+        builder.setMessage("まだログインしていない方は新規登録を行ってください。")
+
+        // ログインボタン
+        builder.setPositiveButton("ログイン") { _, _ ->
+            // ログイン画面へ遷移（LoginActivityを作成している場合）
+            val intent = Intent(activity, LoginActivity::class.java)
+            startActivity(intent)
+        }
+
+        // 新規登録ボタン
+        builder.setNegativeButton("新規登録") { _, _ ->
+            val intent = Intent(activity, RegisterActivity::class.java)
+            startActivity(intent)
+        }
+
+        builder.setNeutralButton("キャンセル") { dialog, _ ->
+            // Challengeページにナビゲート
+            val navController = requireActivity().findNavController(R.id.nav_host_fragment_activity_main)
+            navController.navigate(R.id.navigation_challenge)  // Challengeページに遷移
+            dialog.dismiss()
+        }
+
+        val dialog = builder.create()
+        dialog.show()
     }
 
     override fun onDestroyView() {

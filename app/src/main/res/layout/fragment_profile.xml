@@ -5,73 +5,148 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_image"
-    tools:context=".ui.profile.ProfileFragment">
+    tools:context=".ui.profile.ProfileFragment"
+    android:padding="16dp">
 
+    <!-- アイコン画像（円形、大きめ） -->
     <ImageView
-        android:id="@+id/profile_image"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:id="@+id/profileImageView"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
         android:layout_marginTop="16dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="Profile Image"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/ic_launcher_foreground" /> <!-- プロフィール画像用のプレースホルダー -->
+        app:layout_constraintHorizontal_bias="0.5" />
 
+    <!-- ユーザ名ラベル -->
     <TextView
-        android:id="@+id/label_username"
+        android:id="@+id/usernameLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="ユーザーネーム"
-        app:layout_constraintTop_toBottomOf="@id/profile_image"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="76dp"
+        android:text="ユーザ名"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/edit_username"
-        app:layout_constraintWidth_percent="0.2" />
+        app:layout_constraintTop_toBottomOf="@id/profileImageView" />
 
-    <EditText
-        android:id="@+id/edit_username"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:hint=""
-        app:layout_constraintTop_toBottomOf="@id/profile_image"
-        app:layout_constraintStart_toEndOf="@id/label_username"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintWidth_percent="0.6" />
-
+    <!-- ユーザ名表示 -->
     <TextView
-        android:id="@+id/label_email"
+        android:id="@+id/usernameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="84dp"
+        android:layout_marginTop="76dp"
+        android:text=""
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@id/usernameLabel"
+        app:layout_constraintTop_toBottomOf="@+id/profileImageView" />
+
+    <!-- メールアドレスラベル -->
+    <TextView
+        android:id="@+id/emailLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
         android:layout_marginTop="16dp"
         android:text="メールアドレス"
-        app:layout_constraintTop_toBottomOf="@id/edit_username"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/edit_email"
-        app:layout_constraintWidth_percent="0.2" />
+        app:layout_constraintTop_toBottomOf="@+id/usernameLabel" />
 
-    <EditText
-        android:id="@+id/edit_email"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:hint=""
-        app:layout_constraintTop_toBottomOf="@id/edit_username"
-        app:layout_constraintStart_toEndOf="@id/label_email"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintWidth_percent="0.6" />
-
-    <Button
-        android:id="@+id/button_save"
+    <!-- メールアドレス表示 -->
+    <TextView
+        android:id="@+id/emailTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
-        android:text="Save"
-        app:layout_constraintTop_toBottomOf="@id/edit_email"
+        android:text=""
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/emailLabel"
+        app:layout_constraintTop_toBottomOf="@id/usernameTextView" />
+
+    <!-- パスワードラベル -->
+    <TextView
+        android:id="@+id/passwordLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="16dp"
+        android:text="パスワード"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/emailLabel" />
 
+    <!-- パスワード表示（固定） -->
+    <TextView
+        android:id="@+id/passwordTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:text="********"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.242"
+        app:layout_constraintStart_toEndOf="@id/passwordLabel"
+        app:layout_constraintTop_toBottomOf="@id/emailTextView" />
 
+    <!-- チャレンジジャンルラベル -->
+    <TextView
+        android:id="@+id/challengeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="チャレンジするジャンル"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/passwordLabel" />
+
+    <!-- チャレンジジャンルのドロップダウン -->
+    <Spinner
+        android:id="@+id/challengeSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.105"
+        app:layout_constraintStart_toEndOf="@id/challengeLabel"
+        app:layout_constraintTop_toBottomOf="@+id/passwordTextView" />
+
+    <!-- ログアウトボタン -->
+    <Button
+        android:id="@+id/logoutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ログアウト"
+        android:textSize="18sp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toBottomOf="@id/challengeSpinner"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <!-- 新規登録ボタン -->
+    <Button
+        android:id="@+id/buttonRegister"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="新規登録"
+        android:textSize="18sp"
+        android:layout_marginTop="32dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
