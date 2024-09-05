@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.gms.google-services")
+    id("kotlin-kapt")
 }
 
 android {
@@ -69,7 +70,8 @@ dependencies {
 
     implementation("com.google.firebase:firebase-firestore-ktx:24.3.0")
     implementation("com.github.bumptech.glide:glide:4.12.0")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
+//    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
+    kapt("com.github.bumptech.glide:compiler:4.12.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

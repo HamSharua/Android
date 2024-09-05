@@ -13,6 +13,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.challengeme.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
 
 
 class MainActivity : AppCompatActivity() {
@@ -22,12 +23,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomNavigationView2: BottomNavigationView
     private lateinit var bottomNavigationView3: BottomNavigationView
     private lateinit var bottomNavigationViewList: List<BottomNavigationView>
-
+    private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var authStateListener: FirebaseAuth.AuthStateListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        firebaseAuth = FirebaseAuth.getInstance()
 
         enableEdgeToEdge()
 
@@ -90,6 +93,10 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+
+        if (firebaseAuth.currentUser == null) {
+            navController.navigate(R.id.navigation_profile)  // プロフィールページに移動
         }
 
     }
