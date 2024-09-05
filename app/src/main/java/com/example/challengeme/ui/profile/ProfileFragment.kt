@@ -53,13 +53,12 @@ class ProfileFragment : Fragment() {
                     binding.emailTextView.text = userEmail
                     binding.passwordTextView.text = "********"  // パスワードは非表示で固定
 
-                    // Glideでアイコンを円形に表示
-                    userIconUrl?.let {
-                        Glide.with(this)
-                            .load(it)
-                            .circleCrop()
-                            .into(binding.profileImageView)
-                    }
+                    // Glideでアイコンを円形に表示。アイコンがない場合は profile.png を表示
+                    Glide.with(this)
+                        .load(userIconUrl)
+                        .circleCrop()
+                        .placeholder(R.drawable.profile)  // profile.png をデフォルト画像として使用
+                        .into(binding.profileImageView)
 
                     // アイコンをクリックしたらポップアップで全体表示
                     binding.profileImageView.setOnClickListener {
@@ -97,10 +96,11 @@ class ProfileFragment : Fragment() {
         dialog.setContentView(R.layout.dialog_image_popup)
         val popupImageView = dialog.findViewById<ImageView>(R.id.popupImageView)
 
-        // Glideで画像をロード
-        imageUrl?.let {
-            Glide.with(this).load(it).into(popupImageView)
-        }
+        // Glideで画像をロード。画像がない場合はデフォルトのprofile.pngを表示
+        Glide.with(this)
+            .load(imageUrl)
+            .placeholder(R.drawable.profile)
+            .into(popupImageView)
 
         popupImageView.setOnClickListener {
             dialog.dismiss()  // ポップアップを閉じる
