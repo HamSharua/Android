@@ -19,38 +19,36 @@
 
     <ImageView
         android:id="@+id/challenge_image"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="369dp"
+        android:layout_height="372dp"
         android:layout_margin="16dp"
-        app:layout_constraintTop_toBottomOf="@id/challenge_content"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="32dp"
+        android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/btn_change_challenge"
-        android:scaleType="centerCrop" />
+        app:layout_constraintHorizontal_bias="0.619"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/challenge_content" />
 
     <Button
         android:id="@+id/btn_challenge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="32dp"
         android:text="チャレンジ！"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.746"
+        app:layout_constraintTop_toBottomOf="@+id/challenge_image"
         tools:ignore="MissingConstraints" />
 
     <Button
         android:id="@+id/btn_change_challenge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="48dp"
         android:text="チャレンジ変更"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_challenge"
+        app:layout_constraintTop_toBottomOf="@+id/challenge_image"
         tools:ignore="MissingConstraints" />
 
     <TextView
