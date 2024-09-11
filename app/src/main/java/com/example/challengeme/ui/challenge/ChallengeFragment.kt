@@ -52,6 +52,9 @@ class ChallengeFragment : Fragment() {
 
         updateRemainingChangesText() // 残り回数を表示
 
+        // Restore button state from SharedPreferences
+        updateChangeChallengeButtonState()
+
         // Restore challenge from SharedPreferences
         val savedChallengeContent = sharedPreferences.getString("current_challenge_content", null)
         val savedChallengeImage = sharedPreferences.getString("current_challenge_image", null)
@@ -67,9 +70,9 @@ class ChallengeFragment : Fragment() {
                 fetchRandomChallenge()
                 incrementChangeCount()
                 updateRemainingChangesText() // 残り回数を更新
+                updateChangeChallengeButtonState() // ボタン状態を更新
             } else {
-                changeChallengeButton.isEnabled = false
-                changeChallengeButton.text = "1日の上限回数に達しました"
+                updateChangeChallengeButtonState() // ボタン状態を更新
             }
         }
 
@@ -143,6 +146,16 @@ class ChallengeFragment : Fragment() {
         val calendar = Calendar.getInstance()
         val dateFormat = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return dateFormat.format(calendar.time)
+    }
+
+    private fun updateChangeChallengeButtonState() {
+        if (canChangeChallenge()) {
+            changeChallengeButton.isEnabled = true
+            changeChallengeButton.text = "チャレンジ変更"
+        } else {
+            changeChallengeButton.isEnabled = false
+            changeChallengeButton.text = "変更不可"
+        }
     }
 
     override fun onDestroyView() {
