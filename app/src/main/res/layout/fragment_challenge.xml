@@ -53,6 +53,17 @@
         app:layout_constraintTop_toBottomOf="@id/btn_challenge"
         tools:ignore="MissingConstraints" />
 
+    <TextView
+        android:id="@+id/tv_remaining_changes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="残り変更回数: 3"
+        android:textSize="16sp"
+        android:layout_margin="16dp"
+        app:layout_constraintTop_toBottomOf="@id/challenge_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 

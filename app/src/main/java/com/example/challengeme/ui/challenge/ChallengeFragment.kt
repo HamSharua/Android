@@ -14,6 +14,8 @@ import com.example.challengeme.databinding.FragmentChallengeBinding
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
 import java.util.*
+import android.content.Context
+import android.content.SharedPreferences
 
 class ChallengeFragment : Fragment() {
 
@@ -25,6 +27,11 @@ class ChallengeFragment : Fragment() {
     private lateinit var challengeImage: ImageView
     private lateinit var challengeButton: Button
     private lateinit var changeChallengeButton: Button
+    private lateinit var remainingChangesTextView: TextView
+    private lateinit var sharedPreferences: SharedPreferences
+
+    // 1日の最大変更回数
+    private val MAX_CHANGES_PER_DAY = 3
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,25 +42,37 @@ class ChallengeFragment : Fragment() {
         val view = binding.root
 
         firestore = FirebaseFirestore.getInstance()
+        sharedPreferences = requireContext().getSharedPreferences("challenge_prefs", Context.MODE_PRIVATE)
+
         challengeContent = binding.challengeContent
         challengeImage = binding.challengeImage
         challengeButton = binding.btnChallenge
         changeChallengeButton = binding.btnChangeChallenge
+        remainingChangesTextView = binding.tvRemainingChanges // 追加
 
-        fetchRandomChallenge()
+        updateRemainingChangesText() // 残り回数を表示
+
+        fetchRandomChallenge()  // 関数呼び出し
 
         changeChallengeButton.setOnClickListener {
-            fetchRandomChallenge()
+            if (canChangeChallenge()) {
+                fetchRandomChallenge()
+                incrementChangeCount()
+                updateRemainingChangesText() // 残り回数を更新
+            } else {
+                changeChallengeButton.isEnabled = false
+                changeChallengeButton.text = "1日の上限回数に達しました"
+            }
         }
 
         challengeButton.setOnClickListener {
-            // ChallengeCameraFragmentへ遷移
             findNavController().navigate(R.id.action_challengeFragment_to_challengeCameraFragment)
         }
 
         return view
     }
 
+    // fetchRandomChallenge関数はonCreateViewの後に定義される必要があります
     private fun fetchRandomChallenge() {
         firestore.collection("challenge")
             .get()
@@ -68,11 +87,55 @@ class ChallengeFragment : Fragment() {
             }
     }
 
+    private fun updateRemainingChangesText() {
+        val remainingChanges = MAX_CHANGES_PER_DAY - sharedPreferences.getInt("change_count", 0)
+        remainingChangesTextView.text = "残り変更回数: $remainingChanges"
+    }
+
+    private fun canChangeChallenge(): Boolean {
+        val currentDate = getCurrentDate()
+        val lastChangeDate = sharedPreferences.getString("last_change_date", "")
+        val changeCount = sharedPreferences.getInt("change_count", 0)
+
+        return if (currentDate != lastChangeDate) {
+            resetChangeCount()
+            true
+        } else {
+            changeCount < MAX_CHANGES_PER_DAY
+        }
+    }
+
+    private fun incrementChangeCount() {
+        val currentDate = getCurrentDate()
+        var changeCount = sharedPreferences.getInt("change_count", 0)
+        changeCount++
+
+        sharedPreferences.edit()
+            .putString("last_change_date", currentDate)
+            .putInt("change_count", changeCount)
+            .apply()
+    }
+
+    private fun resetChangeCount() {
+        sharedPreferences.edit()
+            .putString("last_change_date", getCurrentDate())
+            .putInt("change_count", 0)
+            .apply()
+    }
+
+    private fun getCurrentDate(): String {
+        val calendar = Calendar.getInstance()
+        val dateFormat = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return dateFormat.format(calendar.time)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
+
+
 
 //作業用メモ、ファイヤーベースの画像urlの有効期限は3ヶ月に設定
 //変更したかっったら再度、fibase.pyのファイルを更新する(アンドロイドスタジオにはない)
