@@ -88,4 +88,7 @@ dependencies {
 
     // Picassoの依存関係を追加
     implementation("com.squareup.picasso:picasso:2.71828")
+
+    implementation("com.github.bumptech.glide:glide:4.12.0")  // Glide のライブラリ
+    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")  // Glide コンパイラ
 }

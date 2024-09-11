@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.bumptech.glide.Glide
 import com.example.challengeme.LoginActivity
+import com.example.challengeme.ui.profile.ProfileEditActivity  // プロフィール編集画面へのインポート
 import com.example.challengeme.R
 import com.example.challengeme.RegisterActivity
 import com.example.challengeme.databinding.FragmentProfileBinding
@@ -37,10 +39,20 @@ class ProfileFragment : Fragment() {
         firebaseAuth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
 
+        return root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 画面に戻ってきた際に最新のプロフィールデータを取得
+        loadProfileData()
+    }
+
+    private fun loadProfileData() {
         val currentUser = firebaseAuth.currentUser
 
         if (currentUser != null) {
-            // ログインしている場合、Firestoreからユーザーデータを取得
+            // Firestoreからユーザーデータを取得
             val userId = currentUser.uid
             firestore.collection("users").document(userId).get().addOnSuccessListener { document ->
                 if (document != null) {
@@ -53,12 +65,13 @@ class ProfileFragment : Fragment() {
                     binding.emailTextView.text = userEmail
                     binding.passwordTextView.text = "********"  // パスワードは非表示で固定
 
-                    // Glideでアイコンを円形に表示。アイコンがない場合は profile.png を表示
-                    Glide.with(this)
-                        .load(userIconUrl)
-                        .circleCrop()
-                        .placeholder(R.drawable.profile)  // profile.png をデフォルト画像として使用
-                        .into(binding.profileImageView)
+                    // Glideでアイコンを円形に表示
+                    userIconUrl?.let {
+                        Glide.with(this)
+                            .load(it)
+                            .circleCrop()
+                            .into(binding.profileImageView)
+                    }
 
                     // アイコンをクリックしたらポップアップで全体表示
                     binding.profileImageView.setOnClickListener {
@@ -69,9 +82,12 @@ class ProfileFragment : Fragment() {
                 Toast.makeText(context, "データの取得に失敗しました: ${e.message}", Toast.LENGTH_SHORT).show()
             }
 
-            // ログインしている場合、ログアウトボタンを表示
-            binding.logoutButton.visibility = View.VISIBLE
-            binding.buttonRegister.visibility = View.GONE  // ログインしている時は新規登録ボタンを非表示
+            // プロフィール変更ボタンの動作設定
+            binding.buttonEditProfile.setOnClickListener {
+                Log.d("ProfileFragment", "プロフィール変更ボタンが押されました")
+                val intent = Intent(requireContext(), ProfileEditActivity::class.java)
+                startActivity(intent) // プロフィール編集画面に遷移
+            }
 
             // ログアウトボタンの動作設定
             binding.logoutButton.setOnClickListener {
@@ -86,8 +102,6 @@ class ProfileFragment : Fragment() {
             // ログインしていない場合はダイアログを表示
             showLoginDialog()
         }
-
-        return root
     }
 
     // アイコンのポップアップ表示
@@ -96,11 +110,10 @@ class ProfileFragment : Fragment() {
         dialog.setContentView(R.layout.dialog_image_popup)
         val popupImageView = dialog.findViewById<ImageView>(R.id.popupImageView)
 
-        // Glideで画像をロード。画像がない場合はデフォルトのprofile.pngを表示
-        Glide.with(this)
-            .load(imageUrl)
-            .placeholder(R.drawable.profile)
-            .into(popupImageView)
+        // Glideで画像をロード
+        imageUrl?.let {
+            Glide.with(this).load(it).into(popupImageView)
+        }
 
         popupImageView.setOnClickListener {
             dialog.dismiss()  // ポップアップを閉じる
