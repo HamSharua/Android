@@ -52,7 +52,15 @@ class ChallengeFragment : Fragment() {
 
         updateRemainingChangesText() // 残り回数を表示
 
-        fetchRandomChallenge()  // 関数呼び出し
+        // Restore challenge from SharedPreferences
+        val savedChallengeContent = sharedPreferences.getString("current_challenge_content", null)
+        val savedChallengeImage = sharedPreferences.getString("current_challenge_image", null)
+        if (savedChallengeContent != null && savedChallengeImage != null) {
+            challengeContent.text = savedChallengeContent
+            Picasso.get().load(savedChallengeImage).into(challengeImage)
+        } else {
+            fetchRandomChallenge()  // Fetch a new challenge if none is saved
+        }
 
         changeChallengeButton.setOnClickListener {
             if (canChangeChallenge()) {
@@ -72,7 +80,6 @@ class ChallengeFragment : Fragment() {
         return view
     }
 
-    // fetchRandomChallenge関数はonCreateViewの後に定義される必要があります
     private fun fetchRandomChallenge() {
         firestore.collection("challenge")
             .get()
@@ -80,8 +87,17 @@ class ChallengeFragment : Fragment() {
                 val challenges = result.documents
                 if (challenges.isNotEmpty()) {
                     val randomChallenge = challenges[Random().nextInt(challenges.size)]
-                    challengeContent.text = randomChallenge.getString("challenge_content")
+                    val challengeContentText = randomChallenge.getString("challenge_content")
                     val imageUrl = randomChallenge.getString("challenge_image")
+
+                    // Save challenge to SharedPreferences
+                    sharedPreferences.edit()
+                        .putString("current_challenge_content", challengeContentText)
+                        .putString("current_challenge_image", imageUrl)
+                        .apply()
+
+                    // Update UI
+                    challengeContent.text = challengeContentText
                     Picasso.get().load(imageUrl).into(challengeImage)
                 }
             }
