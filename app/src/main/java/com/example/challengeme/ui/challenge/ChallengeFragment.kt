@@ -16,6 +16,7 @@ import com.squareup.picasso.Picasso
 import java.util.*
 import android.content.Context
 import android.content.SharedPreferences
+import android.widget.Toast
 
 class ChallengeFragment : Fragment() {
 
@@ -29,6 +30,7 @@ class ChallengeFragment : Fragment() {
     private lateinit var changeChallengeButton: Button
     private lateinit var remainingChangesTextView: TextView
     private lateinit var sharedPreferences: SharedPreferences
+    private var selectedChallengeId: Long? = null
 
     // 1日の最大変更回数
     private val MAX_CHANGES_PER_DAY = 3
@@ -48,19 +50,21 @@ class ChallengeFragment : Fragment() {
         challengeImage = binding.challengeImage
         challengeButton = binding.btnChallenge
         changeChallengeButton = binding.btnChangeChallenge
-        remainingChangesTextView = binding.tvRemainingChanges // 追加
+        remainingChangesTextView = binding.tvRemainingChanges
 
         updateRemainingChangesText() // 残り回数を表示
 
-        // Restore button state from SharedPreferences
+        // Restore challenge and button state from SharedPreferences
         updateChangeChallengeButtonState()
 
-        // Restore challenge from SharedPreferences
         val savedChallengeContent = sharedPreferences.getString("current_challenge_content", null)
         val savedChallengeImage = sharedPreferences.getString("current_challenge_image", null)
-        if (savedChallengeContent != null && savedChallengeImage != null) {
+        val savedChallengeId = sharedPreferences.getLong("current_challenge_id", -1L) // challenge_id を保存・復元
+
+        if (savedChallengeContent != null && savedChallengeImage != null && savedChallengeId != -1L) {
             challengeContent.text = savedChallengeContent
             Picasso.get().load(savedChallengeImage).into(challengeImage)
+            selectedChallengeId = savedChallengeId
         } else {
             fetchRandomChallenge()  // Fetch a new challenge if none is saved
         }
@@ -77,7 +81,14 @@ class ChallengeFragment : Fragment() {
         }
 
         challengeButton.setOnClickListener {
-            findNavController().navigate(R.id.action_challengeFragment_to_challengeCameraFragment)
+            if (selectedChallengeId != null) {
+                // selectedChallengeId が null でない場合にナビゲート
+                val action = ChallengeFragmentDirections.actionChallengeFragmentToChallengeCameraFragment(selectedChallengeId!!)
+                findNavController().navigate(action)
+            } else {
+                // selectedChallengeId が null の場合にエラーメッセージを表示
+                Toast.makeText(requireContext(), "チャレンジが選択されていません", Toast.LENGTH_SHORT).show()
+            }
         }
 
         return view
@@ -92,17 +103,28 @@ class ChallengeFragment : Fragment() {
                     val randomChallenge = challenges[Random().nextInt(challenges.size)]
                     val challengeContentText = randomChallenge.getString("challenge_content")
                     val imageUrl = randomChallenge.getString("challenge_image")
+                    selectedChallengeId = randomChallenge.getLong("challenge_id") // 選択されたチャレンジIDを保存
 
-                    // Save challenge to SharedPreferences
-                    sharedPreferences.edit()
-                        .putString("current_challenge_content", challengeContentText)
-                        .putString("current_challenge_image", imageUrl)
-                        .apply()
+                    if (selectedChallengeId != null) {
+                        // Save challenge to SharedPreferences
+                        sharedPreferences.edit()
+                            .putString("current_challenge_content", challengeContentText)
+                            .putString("current_challenge_image", imageUrl)
+                            .putLong("current_challenge_id", selectedChallengeId ?: -1L) // challenge_id を保存
+                            .apply()
 
-                    // Update UI
-                    challengeContent.text = challengeContentText
-                    Picasso.get().load(imageUrl).into(challengeImage)
+                        // Update UI
+                        challengeContent.text = challengeContentText
+                        Picasso.get().load(imageUrl).into(challengeImage)
+                    } else {
+                        Toast.makeText(requireContext(), "チャレンジIDが取得できませんでした", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "チャレンジが見つかりませんでした", Toast.LENGTH_SHORT).show()
                 }
+            }
+            .addOnFailureListener {
+                Toast.makeText(requireContext(), "チャレンジの取得に失敗しました", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -163,8 +185,3 @@ class ChallengeFragment : Fragment() {
         _binding = null
     }
 }
-
-
-//残り回数をリセットするには　端末の設定画面　→　chalengemeのアプリ　→　クリアストレージ
-//作業用メモ、ファイヤーベースの画像urlの有効期限は3ヶ月に設定
-//変更したかっったら再度、fibase.pyのファイルを更新する(アンドロイドスタジオにはない)

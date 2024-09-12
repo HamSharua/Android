@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.challengeme.R
 import com.example.challengeme.databinding.FragmentPhotoPreviewBinding
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import java.io.File
@@ -26,6 +27,8 @@ class PhotoPreviewFragment : Fragment() {
     private val args: PhotoPreviewFragmentArgs by navArgs()
     private val db = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
+    private val auth = FirebaseAuth.getInstance() // FirebaseAuthのインスタンスを取得
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -77,13 +80,20 @@ class PhotoPreviewFragment : Fragment() {
     }
 
     private fun saveDataToFirestore(imageUrl: String, comment: String) {
+        // ログインしているユーザーの情報を取得
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val data = hashMapOf(
-            "challenge_id" to 1,
+            "challenge_id" to args.challengeId, // ChallengeFragmentから渡されたchallenge_idを使用
             "comment" to comment,
             "datetime" to Date(),
             "image" to imageUrl,
             "timeline_id" to UUID.randomUUID().toString(),
-            "user_id" to "1"
+            "user_id" to currentUser.uid // ログインしているユーザーのuser_idを使用
         )
 
         db.collection("timeline")

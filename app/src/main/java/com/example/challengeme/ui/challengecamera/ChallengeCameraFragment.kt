@@ -17,6 +17,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.challengeme.databinding.FragmentChallengeCameraBinding
 import java.io.File
 import java.net.URI
@@ -37,8 +38,11 @@ class ChallengeCameraFragment : Fragment() {
         return binding.root
     }
 
+    private val args: ChallengeCameraFragmentArgs by navArgs()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // ChallengeFragment から渡された selectedChallengeId を取得
+        val challengeId = args.selectedChallengeId
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_GRANTED) {
             startCamera()
@@ -47,7 +51,7 @@ class ChallengeCameraFragment : Fragment() {
         }
 
         binding.captureButton.setOnClickListener {
-            takePhoto()
+            takePhoto(challengeId) // challengeId を takePhoto メソッドに渡す
         }
     }
 
@@ -73,7 +77,7 @@ class ChallengeCameraFragment : Fragment() {
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
-    private fun takePhoto() {
+    private fun takePhoto(challengeId: Long) {
         val imageCapture = imageCapture ?: return
 
         val photoFile = File(
@@ -97,7 +101,7 @@ class ChallengeCameraFragment : Fragment() {
 
                     // 撮影した写真を表示するフラグメントに遷移
                     val action = ChallengeCameraFragmentDirections
-                        .actionChallengeCameraFragmentToPhotoPreviewFragment(photoFile.absolutePath)
+                        .actionChallengeCameraFragmentToPhotoPreviewFragment(photoFile.absolutePath, challengeId)
                     findNavController().navigate(action)
                 }
             })
