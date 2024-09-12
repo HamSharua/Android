@@ -1,24 +1,19 @@
 package com.example.challengeme.ui.timeline
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.challengeme.databinding.FragmentTimelineBinding
-import com.example.challengeme.ui.timeline.model.TimelineItem
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 
 class TimelineFragment : Fragment() {
 
     private var _binding: FragmentTimelineBinding? = null
     private val binding get() = _binding!!
-    private lateinit var db: FirebaseFirestore
-    private lateinit var adapter: TimelineAdapter
+    private val firestore = FirebaseFirestore.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,35 +25,41 @@ class TimelineFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        db = Firebase.firestore
-        setupRecyclerView()
+
+        // RecyclerView のレイアウトマネージャーを設定
+        binding.timelineRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         fetchTimelineData()
     }
 
-    private fun setupRecyclerView() {
-        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        adapter = TimelineAdapter(emptyList())
-        binding.recyclerView.adapter = adapter
-    }
-
     private fun fetchTimelineData() {
-        db.collection("timeline")
+        firestore.collection("timeline")
             .get()
-            .addOnSuccessListener { documents ->
+            .addOnSuccessListener { result ->
                 val timelineItems = mutableListOf<TimelineItem>()
-                for (document in documents) {
-                    try {
-                        val item = document.toObject(TimelineItem::class.java)
-                        timelineItems.add(item)
-                    } catch (e: Exception) {
-                        Log.e("TimelineFragment", "Error converting document to TimelineItem", e)
-                    }
+                for (document in result) {
+                    val userId = document.getString("user_id") ?: ""
+                    val comment = document.getString("comment") ?: ""
+                    val imageUrl = document.getString("image") ?: ""
+
+                    // timeline の user_id に対応する users コレクションの user_icon と user_name を取得
+                    firestore.collection("users").document(userId).get()
+                        .addOnSuccessListener { userDoc ->
+                            val userName = userDoc.getString("user_name") ?: ""
+                            val userIcon = userDoc.getString("user_icon") ?: ""
+
+                            val timelineItem = TimelineItem(
+                                userId = userId,
+                                userName = userName,
+                                userIcon = userIcon,
+                                comment = comment,
+                                imageUrl = imageUrl
+                            )
+                            timelineItems.add(timelineItem)
+
+                            // RecyclerView のアダプタをセット
+                            binding.timelineRecyclerView.adapter = TimelineAdapter(timelineItems)
+                        }
                 }
-                adapter = TimelineAdapter(timelineItems)
-                binding.recyclerView.adapter = adapter
-            }
-            .addOnFailureListener { exception ->
-                Log.e("TimelineFragment", "Error fetching timeline data", exception)
             }
     }
 

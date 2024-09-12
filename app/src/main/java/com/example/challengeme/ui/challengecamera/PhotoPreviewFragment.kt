@@ -1,6 +1,8 @@
 package com.example.challengeme.ui.challengecamera
 
-import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -17,7 +20,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import java.io.File
-import java.text.SimpleDateFormat
+import java.io.FileInputStream
+import java.io.IOException
 import java.util.*
 
 class PhotoPreviewFragment : Fragment() {
@@ -27,8 +31,7 @@ class PhotoPreviewFragment : Fragment() {
     private val args: PhotoPreviewFragmentArgs by navArgs()
     private val db = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
-    private val auth = FirebaseAuth.getInstance() // FirebaseAuthのインスタンスを取得
-
+    private val auth = FirebaseAuth.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,7 +48,8 @@ class PhotoPreviewFragment : Fragment() {
         val photoFile = File(args.photoPath)
         if (photoFile.exists()) {
             val uri = Uri.fromFile(photoFile)
-            binding.photoView.setImageURI(uri)
+            val bitmap = correctImageOrientation(photoFile)
+            binding.photoView.setImageBitmap(bitmap) // 修正済みの画像を表示
         } else {
             Toast.makeText(requireContext(), "Failed to load image", Toast.LENGTH_SHORT).show()
         }
@@ -59,6 +63,32 @@ class PhotoPreviewFragment : Fragment() {
 
             uploadImageAndSaveData(photoFile, comment)
         }
+    }
+
+    // 画像の向きを修正するメソッド
+    private fun correctImageOrientation(photoFile: File): Bitmap? {
+        try {
+            val exif = ExifInterface(FileInputStream(photoFile))
+            val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+            val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+
+            return when (orientation) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(bitmap, 90f)
+                ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(bitmap, 180f)
+                ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(bitmap, 270f)
+                else -> bitmap
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return null
+        }
+    }
+
+    // 画像を回転させるメソッド
+    private fun rotateImage(source: Bitmap, angle: Float): Bitmap {
+        val matrix = Matrix()
+        matrix.postRotate(angle)
+        return Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
     }
 
     private fun uploadImageAndSaveData(photoFile: File, comment: String) {
@@ -80,7 +110,6 @@ class PhotoPreviewFragment : Fragment() {
     }
 
     private fun saveDataToFirestore(imageUrl: String, comment: String) {
-        // ログインしているユーザーの情報を取得
         val currentUser = auth.currentUser
         if (currentUser == null) {
             Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show()
@@ -88,25 +117,17 @@ class PhotoPreviewFragment : Fragment() {
         }
 
         val data = hashMapOf(
-            "challenge_id" to args.challengeId, // ChallengeFragmentから渡されたchallenge_idを使用
+            "challenge_id" to args.challengeId,
             "comment" to comment,
             "datetime" to Date(),
             "image" to imageUrl,
             "timeline_id" to UUID.randomUUID().toString(),
-            "user_id" to currentUser.uid // ログインしているユーザーのuser_idを使用
+            "user_id" to currentUser.uid
         )
 
         db.collection("timeline")
             .add(data)
             .addOnSuccessListener {
-                // カレンダーに投稿されたコメントを保存
-                val date = SimpleDateFormat("dd/MM/yyyy", Locale.JAPAN).format(Date())
-                val sharedPref = requireActivity().getSharedPreferences("calenderNotes", Context.MODE_PRIVATE)
-                with(sharedPref.edit()) {
-                    putString(date, comment)  // コメントを保存
-                    apply()
-                }
-
                 Toast.makeText(requireContext(), "Post successful", Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_photoPreviewFragment_to_challengeFragment)
             }
