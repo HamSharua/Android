@@ -98,53 +98,33 @@
         app:layout_constraintTop_toBottomOf="@id/emailTextView" />
 
     <!-- チャレンジジャンルラベル -->
-    <TextView
-        android:id="@+id/challengeLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="チャレンジするジャンル"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passwordLabel" />
 
     <!-- チャレンジジャンルのドロップダウン -->
-    <Spinner
-        android:id="@+id/challengeSpinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.105"
-        app:layout_constraintStart_toEndOf="@id/challengeLabel"
-        app:layout_constraintTop_toBottomOf="@+id/passwordTextView" />
 
     <!-- プロフィール変更ボタン -->
     <Button
         android:id="@+id/buttonEditProfile"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="50dp"
         android:text="プロフィール変更"
-        app:layout_constraintTop_toBottomOf="@+id/challengeSpinner"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/logoutButton"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="8dp"/>
+        app:layout_constraintEnd_toStartOf="@id/logoutButton"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <!-- ログアウトボタン -->
     <Button
         android:id="@+id/logoutButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="50dp"
         android:text="ログアウト"
         android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/challengeSpinner"
-        app:layout_constraintStart_toEndOf="@id/buttonEditProfile"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginStart="8dp"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/buttonEditProfile" />
 
     <!-- 新規登録ボタン -->
     <Button
