@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.challengeme.R
 import com.example.challengeme.databinding.ItemTimelineBinding
 import com.squareup.picasso.Picasso
 
@@ -23,17 +24,28 @@ class TimelineAdapter(private val timelineItems: List<TimelineItem>) :
         holder.binding.userName.text = timelineItem.userName
 
         // ユーザーアイコンを丸く表示
-        Picasso.get().load(timelineItem.userIcon)
-            .transform(CircleTransform())
-            .into(holder.binding.userIcon)
+        if (!timelineItem.userIcon.isNullOrEmpty()) {
+            Picasso.get().load(timelineItem.userIcon)
+                .transform(CircleTransform())
+                .into(holder.binding.userIcon)
+        } else {
+            // デフォルトアイコンを表示
+            holder.binding.userIcon.setImageResource(R.drawable.default_user_icon)
+        }
 
         // コメントをセット
         holder.binding.commentText.text = timelineItem.comment
 
-        // 投稿画像を表示
-        // Firebase Storage の URL からはExif情報を取れないので、単純にPicassoを使う
-        Picasso.get().load(timelineItem.imageUrl).into(holder.binding.postImage)
+        // 画像URLが空でないか確認し、空ならばデフォルト画像を表示
+        if (!timelineItem.imageUrl.isNullOrEmpty()) {
+            // 投稿画像がある場合
+            Picasso.get().load(timelineItem.imageUrl).into(holder.binding.postImage)
+        } else {
+            // 投稿画像がない場合は、デフォルト画像や透明のビューを表示する処理
+            holder.binding.postImage.setImageResource(R.drawable.default_image) // デフォルト画像に差し替えてください
+        }
     }
+
 
     override fun getItemCount(): Int {
         return timelineItems.size

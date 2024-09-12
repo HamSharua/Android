@@ -21,6 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
 
@@ -92,7 +93,15 @@ class PhotoPreviewFragment : Fragment() {
     }
 
     private fun uploadImageAndSaveData(photoFile: File, comment: String) {
-        val uri = Uri.fromFile(photoFile)
+        val correctedBitmap = correctImageOrientation(photoFile)
+        val file = File(requireContext().cacheDir, "corrected_image.png")
+        val outputStream = FileOutputStream(file)
+        if (correctedBitmap != null) {
+            correctedBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        }
+        outputStream.close()
+
+        val uri = Uri.fromFile(file)
         val storageRef = storage.reference.child("images/${UUID.randomUUID()}.png")
         val uploadTask = storageRef.putFile(uri)
 
@@ -108,6 +117,7 @@ class PhotoPreviewFragment : Fragment() {
             Toast.makeText(requireContext(), "Image upload failed", Toast.LENGTH_SHORT).show()
         }
     }
+
 
     private fun saveDataToFirestore(imageUrl: String, comment: String) {
         val currentUser = auth.currentUser
