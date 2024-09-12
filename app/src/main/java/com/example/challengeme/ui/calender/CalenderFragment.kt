@@ -1,5 +1,6 @@
 package com.example.challengeme.ui.calender
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,15 +26,16 @@ class CalenderFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        calenderViewModel =
-            ViewModelProvider(this).get(CalenderViewModel::class.java)
-
+        calenderViewModel = ViewModelProvider(this).get(CalenderViewModel::class.java)
         _binding = FragmentCalenderBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         val calendarView: CalendarView = binding.calendarView
         val editTextNote: EditText = binding.editTextNote
         val buttonSaveNote: Button = binding.buttonSaveNote
+
+        // SharedPreferencesから保存されたメモを取得
+        val sharedPref = requireActivity().getSharedPreferences("calenderNotes", Context.MODE_PRIVATE)
 
         // カレンダーの日付変更リスナーを設定
         calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
@@ -42,17 +44,19 @@ class CalenderFragment : Fragment() {
             calendar.set(year, month, dayOfMonth)
             val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.JAPAN)
             val date = dateFormat.format(calendar.time)
-            calenderViewModel.setSelectedDate(date)
+
             // 選択された日付に対応するメモを表示
-            editTextNote.setText(calenderViewModel.getNoteForDate(date))
+            val note = sharedPref.getString(date, "")
+            editTextNote.setText(note)
         }
 
         // ボタンのクリックリスナーを設定
         buttonSaveNote.setOnClickListener {
             val note = editTextNote.text.toString()
-            val selectedDate = calenderViewModel.selectedDate.value
-            if (selectedDate != null) {
-                calenderViewModel.saveNoteForDate(selectedDate, note)
+            val selectedDate = SimpleDateFormat("dd/MM/yyyy", Locale.JAPAN).format(calendarView.date)
+            with(sharedPref.edit()) {
+                putString(selectedDate, note)
+                apply()
             }
         }
 

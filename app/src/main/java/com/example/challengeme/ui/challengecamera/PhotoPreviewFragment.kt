@@ -1,5 +1,6 @@
 package com.example.challengeme.ui.challengecamera
 
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -15,6 +16,7 @@ import com.example.challengeme.databinding.FragmentPhotoPreviewBinding
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import java.io.File
+import java.text.SimpleDateFormat
 import java.util.*
 
 class PhotoPreviewFragment : Fragment() {
@@ -87,6 +89,14 @@ class PhotoPreviewFragment : Fragment() {
         db.collection("timeline")
             .add(data)
             .addOnSuccessListener {
+                // カレンダーに投稿されたコメントを保存
+                val date = SimpleDateFormat("dd/MM/yyyy", Locale.JAPAN).format(Date())
+                val sharedPref = requireActivity().getSharedPreferences("calenderNotes", Context.MODE_PRIVATE)
+                with(sharedPref.edit()) {
+                    putString(date, comment)  // コメントを保存
+                    apply()
+                }
+
                 Toast.makeText(requireContext(), "Post successful", Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_photoPreviewFragment_to_challengeFragment)
             }
