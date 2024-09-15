@@ -1,5 +1,6 @@
 package com.example.challengeme.ui.timeline
 
+import TimelineItem
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -40,6 +41,7 @@ class TimelineFragment : Fragment() {
                     val userId = document.getString("user_id") ?: ""
                     val comment = document.getString("comment") ?: ""
                     val imageUrl = document.getString("image") ?: ""
+                    val likeCount = document.getLong("likeCount") ?: 0
 
                     // timeline の user_id に対応する users コレクションの user_icon と user_name を取得
                     firestore.collection("users").document(userId).get()
@@ -48,11 +50,13 @@ class TimelineFragment : Fragment() {
                             val userIcon = userDoc.getString("user_icon") ?: ""
 
                             val timelineItem = TimelineItem(
+                                timelineId = document.id,
                                 userId = userId,
                                 userName = userName,
                                 userIcon = userIcon,
                                 comment = comment,
-                                imageUrl = imageUrl
+                                imageUrl = imageUrl,
+                                likeCount = likeCount
                             )
                             timelineItems.add(timelineItem)
 

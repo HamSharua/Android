@@ -1,9 +1,10 @@
-package com.example.challengeme.ui.timeline
-
 data class TimelineItem(
-    val userId: String,
-    val userName: String,
-    val userIcon: String,
-    val comment: String,
-    val imageUrl: String
+    val timelineId: String = "",
+    val userId: String = "",
+    val userName: String = "",
+    val userIcon: String = "",
+    val comment: String = "",
+    val imageUrl: String = "",
+    var likeCount: Long = 0,
+    var isLiked: Boolean = false
 )
