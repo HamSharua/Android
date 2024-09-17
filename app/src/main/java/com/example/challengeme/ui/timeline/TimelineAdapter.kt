@@ -1,5 +1,11 @@
 package com.example.challengeme.ui.timeline
 import TimelineItem
+import android.graphics.Bitmap
+import android.graphics.BitmapShader
+import android.graphics.Canvas
+import android.graphics.Matrix
+import android.graphics.Paint
+import android.graphics.Shader
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -11,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
+import com.squareup.picasso.Transformation
 
 class TimelineAdapter(private val timelineItems: List<TimelineItem>) :
     RecyclerView.Adapter<TimelineAdapter.TimelineViewHolder>() {
@@ -23,11 +30,29 @@ class TimelineAdapter(private val timelineItems: List<TimelineItem>) :
     override fun onBindViewHolder(holder: TimelineViewHolder, position: Int) {
         val timelineItem = timelineItems[position]
 
-        // ユーザー名、アイコン、コメント、画像をセット
+        // ユーザー名をセット
         holder.binding.userName.text = timelineItem.userName
-        Picasso.get().load(timelineItem.userIcon).into(holder.binding.userIcon)
+
+        // ユーザーアイコンを丸くして表示（さらに右に90度回転）
+        if (!timelineItem.userIcon.isNullOrEmpty()) {
+            Picasso.get().load(timelineItem.userIcon)
+                .transform(CircleTransform()) // 丸く表示しつつ、画像を右に90度回転
+                .into(holder.binding.userIcon)
+        } else {
+            // デフォルトアイコンを表示
+            holder.binding.userIcon.setImageResource(R.drawable.profile)
+        }
+
+        // コメントをセット
         holder.binding.commentText.text = timelineItem.comment
-        Picasso.get().load(timelineItem.imageUrl).into(holder.binding.postImage)
+
+        // 投稿画像を表示
+        if (!timelineItem.imageUrl.isNullOrEmpty()) {
+            Picasso.get().load(timelineItem.imageUrl)
+                .into(holder.binding.postImage)
+        } else {
+            holder.binding.postImage.setImageResource(R.drawable.default_image)
+        }
 
         // いいねカウントを表示
         holder.binding.likeCountTextView.text = timelineItem.likeCount.toString()
@@ -92,4 +117,39 @@ class TimelineAdapter(private val timelineItems: List<TimelineItem>) :
     }
 
     inner class TimelineViewHolder(val binding: ItemTimelineBinding) : RecyclerView.ViewHolder(binding.root)
+
+    // Picasso 用の丸い画像変換クラス（右に90度回転させる）
+    class CircleTransform : Transformation {
+        override fun transform(source: Bitmap): Bitmap {
+            val size = Math.min(source.width, source.height)
+            val x = (source.width - size) / 2
+            val y = (source.height - size) / 2
+            val squaredBitmap = Bitmap.createBitmap(source, x, y, size, size)
+            if (squaredBitmap != source) {
+                source.recycle()
+            }
+
+            // ビットマップを右に90度回転させる
+            val matrix = Matrix()
+            matrix.postRotate(90f) // 右に90度回転
+
+            val rotatedBitmap = Bitmap.createBitmap(squaredBitmap, 0, 0, size, size, matrix, true)
+
+            val bitmap = Bitmap.createBitmap(size, size, source.config)
+            val canvas = Canvas(bitmap)
+            val paint = Paint()
+            val shader = BitmapShader(rotatedBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+            paint.shader = shader
+            paint.isAntiAlias = true
+            val r = size / 2f
+            canvas.drawCircle(r, r, r, paint)
+            squaredBitmap.recycle()
+            return bitmap
+        }
+
+        override fun key(): String {
+            return "circle_with_rotation"
+        }
+    }
+
 }
