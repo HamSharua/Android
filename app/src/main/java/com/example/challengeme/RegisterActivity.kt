@@ -113,7 +113,10 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    // Firestoreにユーザーデータを保存
+    // デフォルトのプロフィールアイコンのURL
+    private val DEFAULT_USER_ICON_URL = "https://firebasestorage.googleapis.com/v0/b/challengeme-56fd7.appspot.com/o/user_icons%2Fprofile.png?alt=media&token=c2087aa3-e02c-4aea-9831-d434b5614612"
+
+    // Firestoreにユーザーデータを登録または更新するメソッド
     private fun saveUserToFirestore(
         userId: String,
         email: String,
@@ -122,6 +125,7 @@ class RegisterActivity : AppCompatActivity() {
         registrationDate: Date,
         iconUrl: String?
     ) {
+        // Firestoreに保存するユーザー情報のマップを作成
         val userMap = hashMapOf(
             "challenge_num" to "all",
             "registration_date" to registrationDate,
@@ -131,18 +135,35 @@ class RegisterActivity : AppCompatActivity() {
             "user_pass" to password
         )
 
-        iconUrl?.let {
-            userMap["user_icon"] = it
-        }
+        // アイコンURLがnullの場合はデフォルトのプロフィール画像を使用
+        userMap["user_icon"] = iconUrl ?: DEFAULT_USER_ICON_URL
 
+        // Firestoreにデータを保存
         firestore.collection("users").document(userId).set(userMap)
             .addOnSuccessListener {
+                // 成功時にメッセージを表示し、メイン画面へ遷移
                 Toast.makeText(this, "登録が成功しました", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }
             .addOnFailureListener { e ->
+                // 失敗時にエラーメッセージを表示
                 Toast.makeText(this, "Firestoreへの保存に失敗しました: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
+    // 登録プロセス内でこの関数を呼び出す
+    private fun registerUser(userId: String, email: String, name: String, password: String) {
+        // 登録日時を取得
+        val registrationDate = Date()
+
+        // ユーザーが画像を選択している場合、画像をFirebase Storageにアップロード
+        if (imageUri != null) {
+            uploadIconAndSaveUser(imageUri!!, userId, email, name, password, registrationDate)
+        } else {
+            // 画像が選択されていない場合、デフォルトのアイコンで保存
+            saveUserToFirestore(userId, email, name, password, registrationDate, null)
+        }
+    }
+
 }
