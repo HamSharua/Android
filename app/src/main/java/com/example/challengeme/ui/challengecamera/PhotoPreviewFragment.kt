@@ -1,5 +1,6 @@
 package com.example.challengeme.ui.challengecamera
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
@@ -10,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -23,6 +25,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.text.SimpleDateFormat
 import java.util.*
 
 class PhotoPreviewFragment : Fragment() {
@@ -118,7 +121,6 @@ class PhotoPreviewFragment : Fragment() {
         }
     }
 
-
     private fun saveDataToFirestore(imageUrl: String, comment: String) {
         val currentUser = auth.currentUser
         if (currentUser == null) {
@@ -138,13 +140,53 @@ class PhotoPreviewFragment : Fragment() {
         db.collection("timeline")
             .add(data)
             .addOnSuccessListener {
-                Toast.makeText(requireContext(), "Post successful", Toast.LENGTH_SHORT).show()
-                findNavController().navigate(R.id.action_photoPreviewFragment_to_challengeFragment)
+                // チャレンジコンテンツをカレンダーのメモ欄に保存
+                saveChallengeContentToCalendar(args.challengeId)
+
+                // 投稿完了メッセージ
+                AlertDialog.Builder(requireContext())
+                    .setTitle("投稿完了")
+                    .setMessage("投稿が完了しました。OKボタンを押すと、チャレンジ画面に戻ります。")
+                    .setPositiveButton("OK") { _, _ ->
+                        findNavController().navigate(R.id.action_photoPreviewFragment_to_challengeFragment)
+                    }
+                    .show()
             }
             .addOnFailureListener { e ->
                 Log.e("PhotoPreviewFragment", "Error saving data", e)
                 Toast.makeText(requireContext(), "Failed to save post", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    // Firestore からチャレンジデータを取得し、SharedPreferences に保存
+    private fun saveChallengeContentToCalendar(challengeId: Long) {
+        db.collection("challenge").whereEqualTo("challenge_id", challengeId).get()
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    Toast.makeText(requireContext(), "Challenge not found", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
+
+                for (document in documents) {
+                    val challengeContent = document.getString("challenge_content")
+                    if (challengeContent != null) {
+                        // 取得したチャレンジコンテンツをSharedPreferencesに保存
+                        saveToCalendarSharedPref(challengeContent)
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("PhotoPreviewFragment", "Failed to fetch challenge data", e)
+            }
+    }
+
+    private fun saveToCalendarSharedPref(content: String) {
+        val date = SimpleDateFormat("dd/MM/yyyy", Locale.JAPAN).format(Date())
+        val sharedPref = requireActivity().getSharedPreferences("calenderNotes", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString(date, content)  // チャレンジコンテンツを保存
+            apply()
+        }
     }
 
     override fun onDestroyView() {
