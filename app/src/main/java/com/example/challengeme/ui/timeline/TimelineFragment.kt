@@ -16,6 +16,8 @@ class TimelineFragment : Fragment() {
     private val binding get() = _binding!!
     private val firestore = FirebaseFirestore.getInstance()
 
+    private val timelineItems = mutableListOf<TimelineItem>()  // timelineItemsをフィールドに保持
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -29,6 +31,11 @@ class TimelineFragment : Fragment() {
 
         // RecyclerView のレイアウトマネージャーを設定
         binding.timelineRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // アダプタを事前にセット
+        binding.timelineRecyclerView.adapter = TimelineAdapter(timelineItems, this@TimelineFragment)
+
+        // データを取得
         fetchTimelineData()
     }
 
@@ -36,14 +43,13 @@ class TimelineFragment : Fragment() {
         firestore.collection("timeline")
             .get()
             .addOnSuccessListener { result ->
-                val timelineItems = mutableListOf<TimelineItem>()
+                timelineItems.clear()  // 既存のデータをクリア
                 for (document in result) {
                     val userId = document.getString("user_id") ?: ""
                     val comment = document.getString("comment") ?: ""
                     val imageUrl = document.getString("image") ?: ""
                     val likeCount = document.getLong("likeCount") ?: 0
 
-                    // timeline の user_id に対応する users コレクションの user_icon と user_name を取得
                     firestore.collection("users").document(userId).get()
                         .addOnSuccessListener { userDoc ->
                             val userName = userDoc.getString("user_name") ?: ""
@@ -60,8 +66,8 @@ class TimelineFragment : Fragment() {
                             )
                             timelineItems.add(timelineItem)
 
-                            // RecyclerView のアダプタをセット
-                            binding.timelineRecyclerView.adapter = TimelineAdapter(timelineItems)
+                            // データ変更を通知
+                            binding.timelineRecyclerView.adapter?.notifyDataSetChanged()
                         }
                 }
             }

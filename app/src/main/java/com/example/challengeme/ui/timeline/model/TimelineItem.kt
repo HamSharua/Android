@@ -6,5 +6,6 @@ data class TimelineItem(
     val comment: String = "",
     val imageUrl: String = "",
     var likeCount: Long = 0,
+    var commentCount: Long = 0,
     var isLiked: Boolean = false
 )
