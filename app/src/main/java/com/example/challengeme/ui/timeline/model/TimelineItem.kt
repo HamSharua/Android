@@ -7,5 +7,6 @@ data class TimelineItem(
     val imageUrl: String = "",
     var likeCount: Long = 0,
     var commentCount: Long = 0,
-    var isLiked: Boolean = false
+    var isLiked: Boolean = false,
+    val datetime: com.google.firebase.Timestamp? = null  // 追加
 )

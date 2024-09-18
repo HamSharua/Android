@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.challengeme.databinding.FragmentTimelineBinding
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 class TimelineFragment : Fragment() {
 
@@ -41,6 +42,7 @@ class TimelineFragment : Fragment() {
 
     private fun fetchTimelineData() {
         firestore.collection("timeline")
+            .orderBy("datetime", Query.Direction.DESCENDING)  // 新しい順に並べ替え
             .get()
             .addOnSuccessListener { result ->
                 timelineItems.clear()  // 既存のデータをクリア
@@ -49,6 +51,8 @@ class TimelineFragment : Fragment() {
                     val comment = document.getString("comment") ?: ""
                     val imageUrl = document.getString("image") ?: ""
                     val likeCount = document.getLong("likeCount") ?: 0
+                    val commentCount = document.getLong("commentCount") ?: 0
+                    val datetime = document.getTimestamp("datetime")  // datetime を取得
 
                     firestore.collection("users").document(userId).get()
                         .addOnSuccessListener { userDoc ->
@@ -62,7 +66,9 @@ class TimelineFragment : Fragment() {
                                 userIcon = userIcon,
                                 comment = comment,
                                 imageUrl = imageUrl,
-                                likeCount = likeCount
+                                likeCount = likeCount,
+                                commentCount = commentCount,
+                                datetime = datetime  // 取得した datetime をセット
                             )
                             timelineItems.add(timelineItem)
 
@@ -72,6 +78,8 @@ class TimelineFragment : Fragment() {
                 }
             }
     }
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()

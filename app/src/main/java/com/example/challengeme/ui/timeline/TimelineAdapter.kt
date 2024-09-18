@@ -19,8 +19,12 @@ import com.example.challengeme.databinding.ItemTimelineBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Transformation
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
 
 class TimelineAdapter(
     private val timelineItems: List<TimelineItem>,
@@ -37,6 +41,17 @@ class TimelineAdapter(
 
         // ユーザー名をセット
         holder.binding.userName.text = timelineItem.userName
+
+        // 投稿時間を表示（UTC+9に設定）
+        val dateFormat = SimpleDateFormat("yyyy年MM月dd日 HH:mm", Locale.getDefault())
+        dateFormat.timeZone = TimeZone.getTimeZone("Asia/Tokyo")  // UTC+9のタイムゾーンに設定
+
+        if (timelineItem.datetime != null) {
+            val dateStr = dateFormat.format(timelineItem.datetime.toDate())
+            holder.binding.postTime.text = dateStr
+        } else {
+            holder.binding.postTime.text = "不明"
+        }
 
         // ユーザーアイコンを丸くして表示（さらに右に90度回転）
         if (!timelineItem.userIcon.isNullOrEmpty()) {
@@ -61,8 +76,15 @@ class TimelineAdapter(
         // いいねカウントを表示
         holder.binding.likeCountTextView.text = timelineItem.likeCount.toString()
 
-        // コメント数を表示
-        holder.binding.commentCountTextView.text = timelineItem.commentCount.toString()
+        // Firestoreからコメント数を取得してセット
+        val postRef = FirebaseFirestore.getInstance().collection("timeline").document(timelineItem.timelineId)
+        postRef.collection("comments")
+            .get()
+            .addOnSuccessListener { result ->
+                val commentCount = result.size()  // commentsサブコレクションのドキュメント数を取得
+                holder.binding.commentCountTextView.text = "$commentCount コメント"  // コメント数を表示
+                timelineItem.commentCount = commentCount.toLong()  // TimelineItemに保存（必要に応じて）
+            }
 
         // いいねボタンの状態を確認してアイコンを設定
         checkIfLiked(holder, timelineItem)
@@ -74,7 +96,15 @@ class TimelineAdapter(
 
         // コメントアイコンがクリックされたときにダイアログを表示
         holder.binding.commentIcon.setOnClickListener {
-            val commentsDialog = CommentsDialogFragment(timelineItem.timelineId)
+            val commentsDialog = CommentsDialogFragment(timelineItem.timelineId) {
+                // コメント数を再度取得して表示を更新
+                postRef.collection("comments")
+                    .get()
+                    .addOnSuccessListener { result ->
+                        val updatedCommentCount = result.size()
+                        holder.binding.commentCountTextView.text = "$updatedCommentCount コメント"
+                    }
+            }
             commentsDialog.show(fragment.childFragmentManager, "CommentsDialog")
         }
 
@@ -85,8 +115,6 @@ class TimelineAdapter(
                 addCommentToPost(timelineItem, commentText, holder)
             }
         }
-        // コメントをFirestoreから取得して表示
-//        loadComments(holder, timelineItem)
     }
 
     override fun getItemCount(): Int = timelineItems.size
@@ -102,8 +130,11 @@ class TimelineAdapter(
 
         val postRef = FirebaseFirestore.getInstance().collection("timeline").document(timelineItem.timelineId)
         postRef.collection("comments").add(commentData).addOnSuccessListener {
-            // コメントが追加されたらcommentCountを増加
-            postRef.update("commentCount", FieldValue.increment(1))
+            // コメントが追加されたらFirestoreからcommentCountを再取得
+            postRef.collection("comments").get().addOnSuccessListener { result ->
+                val updatedCommentCount = result.size()
+                holder.binding.commentCountTextView.text = "$updatedCommentCount コメント"
+            }
 
             // コメント欄をクリア
             holder.binding.commentEditText.text.clear()
@@ -117,27 +148,31 @@ class TimelineAdapter(
     // Firestoreからコメントを取得して表示するメソッド
     private fun loadComments(holder: TimelineViewHolder, timelineItem: TimelineItem) {
         val postRef = FirebaseFirestore.getInstance().collection("timeline").document(timelineItem.timelineId)
-        postRef.collection("comments").orderBy("commentedAt").get().addOnSuccessListener { result ->
-            val comments = mutableListOf<Comment>()
-            for (document in result) {
-                val commentText = document.getString("commentText") ?: ""
-                val userId = document.getString("userId") ?: ""
-                val commentedAt = document.getTimestamp("commentedAt")
+        postRef.collection("comments")
+            .orderBy("commentedAt", Query.Direction.DESCENDING)  // 新しい順に並べ替え
+            .get()
+            .addOnSuccessListener { result ->
+                val comments = mutableListOf<Comment>()
+                for (document in result) {
+                    val commentText = document.getString("commentText") ?: ""
+                    val userId = document.getString("userId") ?: ""
+                    val commentedAt = document.getTimestamp("commentedAt")
 
-                comments.add(Comment(userId, commentText, commentedAt))
-            }
+                    comments.add(Comment(userId, commentText, commentedAt))
+                }
 
-            // コメントが存在する場合のみRecyclerViewを表示
-            if (comments.isNotEmpty()) {
-                holder.binding.commentsRecyclerView.visibility = View.VISIBLE
-                val commentAdapter = CommentAdapter(comments)
-                holder.binding.commentsRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context)
-                holder.binding.commentsRecyclerView.adapter = commentAdapter
-            } else {
-                holder.binding.commentsRecyclerView.visibility = View.GONE
+                // コメントが存在する場合のみRecyclerViewを表示
+                if (comments.isNotEmpty()) {
+                    holder.binding.commentsRecyclerView.visibility = View.VISIBLE
+                    val commentAdapter = CommentAdapter(comments)
+                    holder.binding.commentsRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context)
+                    holder.binding.commentsRecyclerView.adapter = commentAdapter
+                } else {
+                    holder.binding.commentsRecyclerView.visibility = View.GONE
+                }
             }
-        }
     }
+
 
     // いいねの状態を確認してアイコンを更新するメソッド
     private fun checkIfLiked(holder: TimelineViewHolder, timelineItem: TimelineItem) {

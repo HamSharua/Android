@@ -6,11 +6,13 @@ import android.view.*
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.challengeme.databinding.FragmentCommentsDialogBinding
-import com.example.challengeme.ui.timeline.CommentAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class CommentsDialogFragment(private val timelineId: String) : DialogFragment() {
+class CommentsDialogFragment(
+    private val timelineId: String,
+    private val onCommentAdded: () -> Unit
+) : DialogFragment() {
 
     private var _binding: FragmentCommentsDialogBinding? = null
     private val binding get() = _binding!!
@@ -73,6 +75,9 @@ class CommentsDialogFragment(private val timelineId: String) : DialogFragment() 
                 // 新しいコメントを表示
                 comments.add(Comment(currentUserId ?: "", commentText, com.google.firebase.Timestamp.now()))
                 adapter.notifyItemInserted(comments.size - 1)
+
+                // コメント数更新のコールバックを呼び出し
+                onCommentAdded.invoke()
             }
     }
 

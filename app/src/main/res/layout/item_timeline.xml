@@ -13,35 +13,54 @@
         android:id="@+id/userIcon"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
         android:contentDescription="User Icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- ユーザー名 -->
-    <TextView
-        android:id="@+id/userName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:text="User Name"
-        app:layout_constraintStart_toEndOf="@id/userIcon"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!-- ユーザー名と投稿時間を表示するLinearLayout -->
 
     <!-- 投稿画像 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@+id/userIcon"
+        app:layout_constraintStart_toEndOf="@id/userIcon"
+        app:layout_constraintTop_toTopOf="@+id/userIcon">
+
+        <!-- ユーザー名 (太字) -->
+        <TextView
+            android:id="@+id/userName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="User Name"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <!-- 投稿時間 (datetime) -->
+        <TextView
+            android:id="@+id/postTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="投稿時間"
+            android:textColor="#808080" />
+    </LinearLayout>
+
     <ImageView
         android:id="@+id/postImage"
         android:layout_width="0dp"
         android:layout_height="200dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:contentDescription="Post Image"
-        app:layout_constraintTop_toBottomOf="@id/userIcon"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/userIcon"
         tools:srcCompat="@tools:sample/avatars" />
 
     <!-- コメントテキスト -->
@@ -49,11 +68,14 @@
         android:id="@+id/commentText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:text="Comment"
-        app:layout_constraintTop_toBottomOf="@id/postImage"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/postImage" />
 
     <!-- いいねボタン -->
     <ImageView
@@ -63,8 +85,8 @@
         android:layout_margin="8dp"
         android:contentDescription="Like Button"
         android:src="@drawable/ic_heart_outline"
-        app:layout_constraintTop_toBottomOf="@id/commentText"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="@+id/commentText"
+        app:layout_constraintTop_toBottomOf="@id/commentText" />
 
     <!-- いいね数を表示するTextView -->
     <TextView
@@ -88,20 +110,22 @@
         android:src="@drawable/comment_icon"
         app:layout_constraintStart_toEndOf="@id/likeCountTextView"
         app:layout_constraintTop_toTopOf="@id/likeButton"
-        app:layout_constraintBottom_toBottomOf="@id/likeButton"
-        android:onClick="toggleCommentInputVisibility" />
+        app:layout_constraintBottom_toBottomOf="@id/likeButton" />
 
     <!-- コメント数を表示するTextView -->
+
+    <!-- コメント一覧を表示するRecyclerView -->
     <TextView
         android:id="@+id/commentCountTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
         android:text="0 コメント"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/likeButton" />
+        app:layout_constraintStart_toEndOf="@+id/commentIcon"
+        app:layout_constraintTop_toTopOf="@+id/commentIcon" />
 
-    <!-- コメント一覧を表示するRecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/commentsRecyclerView"
         android:layout_width="0dp"
