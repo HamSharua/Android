@@ -20,6 +20,7 @@ class CalenderFragment : Fragment() {
     private var _binding: FragmentCalenderBinding? = null
     private val binding get() = _binding!!
     private lateinit var calenderViewModel: CalenderViewModel
+    private var selectedDate: String? = null // 選択された日付を保存
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,26 +38,35 @@ class CalenderFragment : Fragment() {
         // SharedPreferencesから保存されたメモを取得
         val sharedPref = requireActivity().getSharedPreferences("calenderNotes", Context.MODE_PRIVATE)
 
+        // 日付のフォーマット
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.JAPAN)
+
+        // カレンダーの初期選択日（現在日付）を取得して表示
+        val todayDate = dateFormat.format(calendarView.date) // カレンダーのデフォルト日付（本日）を取得
+        selectedDate = todayDate // 本日の日付を選択された日付として設定
+        val todayNote = sharedPref.getString(todayDate, "") // 本日の日付に対応するメモを取得
+        editTextNote.setText(todayNote) // メモを表示
+
         // カレンダーの日付変更リスナーを設定
-        calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
+        calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
             // 日付が変更されたときの処理
             val calendar = Calendar.getInstance()
             calendar.set(year, month, dayOfMonth)
-            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.JAPAN)
-            val date = dateFormat.format(calendar.time)
+            selectedDate = dateFormat.format(calendar.time) // 選択された日付を保存
 
             // 選択された日付に対応するメモを表示
-            val note = sharedPref.getString(date, "")
+            val note = sharedPref.getString(selectedDate, "")
             editTextNote.setText(note)
         }
 
         // ボタンのクリックリスナーを設定
         buttonSaveNote.setOnClickListener {
             val note = editTextNote.text.toString()
-            val selectedDate = SimpleDateFormat("dd/MM/yyyy", Locale.JAPAN).format(calendarView.date)
-            with(sharedPref.edit()) {
-                putString(selectedDate, note)
-                apply()
+            if (selectedDate != null) {
+                with(sharedPref.edit()) {
+                    putString(selectedDate, note) // 選択された日付に対してメモを保存
+                    apply()
+                }
             }
         }
 
