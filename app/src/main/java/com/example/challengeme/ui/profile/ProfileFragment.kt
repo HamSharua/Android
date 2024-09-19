@@ -147,8 +147,9 @@ class ProfileFragment : Fragment() {
             navController.navigate(R.id.navigation_challenge)  // Challengeページに遷移
             dialog.dismiss()
         }
-
         val dialog = builder.create()
+        // ポップアップ外をタップしても閉じないようにする
+        dialog.setCancelable(false)
         dialog.show()
     }
 
