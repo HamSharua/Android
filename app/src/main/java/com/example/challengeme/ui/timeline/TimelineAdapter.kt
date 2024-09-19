@@ -156,6 +156,8 @@ class TimelineAdapter(
             postRef.collection("comments").get().addOnSuccessListener { result ->
                 val updatedCommentCount = result.size()
                 holder.binding.commentCountTextView.text = "$updatedCommentCount コメント"
+                // コメント追加時に通知を保存
+                sendCommentNotification(timelineItem, currentUserId ?: "")
             }
 
             // コメント欄をクリア
@@ -215,6 +217,30 @@ class TimelineAdapter(
         }
     }
 
+    // Firestoreにいいねの通知を保存
+    private fun sendLikeNotification(timelineItem: TimelineItem, likedByUserId: String) {
+        val notificationData = hashMapOf(
+            "type" to "like",
+            "timelineId" to timelineItem.timelineId,
+            "likedByUserId" to likedByUserId,
+            "postOwnerId" to timelineItem.userId,
+            "timestamp" to com.google.firebase.Timestamp.now()
+        )
+        FirebaseFirestore.getInstance().collection("notifications").add(notificationData)
+    }
+
+    // Firestoreにコメントの通知を保存
+    private fun sendCommentNotification(timelineItem: TimelineItem, commentedByUserId: String) {
+        val notificationData = hashMapOf(
+            "type" to "comment",
+            "timelineId" to timelineItem.timelineId,
+            "commentedByUserId" to commentedByUserId,
+            "postOwnerId" to timelineItem.userId,
+            "timestamp" to com.google.firebase.Timestamp.now()
+        )
+        FirebaseFirestore.getInstance().collection("notifications").add(notificationData)
+    }
+
     // いいねを切り替えるメソッド
     private fun toggleLike(holder: TimelineViewHolder, timelineItem: TimelineItem) {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
@@ -239,6 +265,9 @@ class TimelineAdapter(
                 timelineItem.isLiked = true
                 timelineItem.likeCount++
                 holder.binding.likeCountTextView.text = timelineItem.likeCount.toString()
+
+                // いいね通知を送信
+                sendLikeNotification(timelineItem, currentUserId)
             }
         }
     }
