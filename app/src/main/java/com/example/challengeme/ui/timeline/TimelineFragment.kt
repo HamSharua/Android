@@ -86,6 +86,6 @@ class TimelineFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = nullああ
+        _binding = null
     }
 }
