@@ -54,10 +54,10 @@ class TimelineAdapter(
             holder.binding.postTime.text = "不明"
         }
 
-        // ユーザーアイコンを丸くして表示（さらに右に90度回転）
+        // ユーザーアイコンを丸くして表示
         if (!timelineItem.userIcon.isNullOrEmpty()) {
             Picasso.get().load(timelineItem.userIcon)
-                .transform(CircleTransform()) // 丸く表示しつつ、画像を右に90度回転
+                .transform(CircleTransform()) // 丸く表示
                 .into(holder.binding.userIcon)
         } else {
             // デフォルトアイコンを表示
@@ -245,7 +245,7 @@ class TimelineAdapter(
 
     inner class TimelineViewHolder(val binding: ItemTimelineBinding) : RecyclerView.ViewHolder(binding.root)
 
-    // Picasso 用の丸い画像変換クラス（右に90度回転させる）
+    // Picasso 用の丸い画像変換クラス
     class CircleTransform : Transformation {
         override fun transform(source: Bitmap): Bitmap {
             val size = Math.min(source.width, source.height)
@@ -256,16 +256,10 @@ class TimelineAdapter(
                 source.recycle()
             }
 
-            // ビットマップを右に90度回転させる
-            val matrix = Matrix()
-            matrix.postRotate(90f) // 右に90度回転
-
-            val rotatedBitmap = Bitmap.createBitmap(squaredBitmap, 0, 0, size, size, matrix, true)
-
             val bitmap = Bitmap.createBitmap(size, size, source.config)
             val canvas = Canvas(bitmap)
             val paint = Paint()
-            val shader = BitmapShader(rotatedBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+            val shader = BitmapShader(squaredBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
             paint.shader = shader
             paint.isAntiAlias = true
             val r = size / 2f
@@ -275,7 +269,8 @@ class TimelineAdapter(
         }
 
         override fun key(): String {
-            return "circle_with_rotation"
+            return "circle"
         }
     }
+
 }
