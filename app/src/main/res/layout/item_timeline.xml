@@ -50,20 +50,22 @@
     </LinearLayout>
 
     <!-- 投稿画像 -->
+
+    <!-- チャレンジ内容を表示するTextView -->
     <ImageView
         android:id="@+id/postImage"
         android:layout_width="0dp"
         android:layout_height="200dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
         android:contentDescription="Post Image"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/userIcon"
+        app:layout_constraintVertical_bias="0.148"
         tools:srcCompat="@tools:sample/avatars" />
 
-    <!-- チャレンジ内容を表示するTextView -->
     <TextView
         android:id="@+id/challengeContentTextView"
         android:layout_width="0dp"
