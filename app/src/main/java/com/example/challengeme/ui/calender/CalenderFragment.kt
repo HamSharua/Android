@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.CalendarView
 import android.widget.EditText
 import androidx.fragment.app.Fragment
@@ -33,7 +32,7 @@ class CalenderFragment : Fragment() {
 
         val calendarView: CalendarView = binding.calendarView
         val editTextNote: EditText = binding.editTextNote
-        val buttonSaveNote: Button = binding.buttonSaveNote
+        // val buttonSaveNote: Button = binding.buttonSaveNote // コメントアウトされたため削除
 
         // SharedPreferencesから保存されたメモを取得
         val sharedPref = requireActivity().getSharedPreferences("calenderNotes", Context.MODE_PRIVATE)
@@ -59,7 +58,8 @@ class CalenderFragment : Fragment() {
             editTextNote.setText(note)
         }
 
-        // ボタンのクリックリスナーを設定
+        /*
+        // ボタンのクリックリスナーを設定（削除）
         buttonSaveNote.setOnClickListener {
             val note = editTextNote.text.toString()
             if (selectedDate != null) {
@@ -69,6 +69,7 @@ class CalenderFragment : Fragment() {
                 }
             }
         }
+        */
 
         return root
     }
