@@ -2,6 +2,7 @@ package com.example.challengeme.ui.timeline
 
 import TimelineItem
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +18,8 @@ class TimelineFragment : Fragment() {
     private val binding get() = _binding!!
     private val firestore = FirebaseFirestore.getInstance()
 
-    private val timelineItems = mutableListOf<TimelineItem>()  // timelineItemsをフィールドに保持
+    // タイムラインデータを保持するリスト
+    private val timelineItems = mutableListOf<TimelineItem>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,10 +35,16 @@ class TimelineFragment : Fragment() {
         // RecyclerView のレイアウトマネージャーを設定
         binding.timelineRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        // アダプタを事前にセット
+        // アダプターをセット
         binding.timelineRecyclerView.adapter = TimelineAdapter(timelineItems, this@TimelineFragment)
 
-        // データを取得
+        // 初回データを取得
+        fetchTimelineData()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 他のページから戻ってきたときに最新のデータを再取得する
         fetchTimelineData()
     }
 
@@ -70,8 +78,7 @@ class TimelineFragment : Fragment() {
                                 likeCount = likeCount,
                                 commentCount = commentCount,
                                 datetime = datetime,  // 取得した datetime をセット
-                                challengeId = challengeId  // ここにchallengeIdをセット
-
+                                challengeId = challengeId  // challengeIdをセット
                             )
                             timelineItems.add(timelineItem)
 
@@ -80,9 +87,10 @@ class TimelineFragment : Fragment() {
                         }
                 }
             }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error fetching timeline data", e)
+            }
     }
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()
