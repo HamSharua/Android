@@ -53,6 +53,7 @@ class TimelineFragment : Fragment() {
                     val likeCount = document.getLong("likeCount") ?: 0
                     val commentCount = document.getLong("commentCount") ?: 0
                     val datetime = document.getTimestamp("datetime")  // datetime を取得
+                    val challengeId = document.getLong("challenge_id") ?: 0  // challenge_id を取得
 
                     firestore.collection("users").document(userId).get()
                         .addOnSuccessListener { userDoc ->
@@ -68,7 +69,9 @@ class TimelineFragment : Fragment() {
                                 imageUrl = imageUrl,
                                 likeCount = likeCount,
                                 commentCount = commentCount,
-                                datetime = datetime  // 取得した datetime をセット
+                                datetime = datetime,  // 取得した datetime をセット
+                                challengeId = challengeId  // ここにchallengeIdをセット
+
                             )
                             timelineItems.add(timelineItem)
 

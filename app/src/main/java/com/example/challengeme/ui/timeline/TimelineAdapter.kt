@@ -8,6 +8,7 @@ import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Shader
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -107,6 +108,27 @@ class TimelineAdapter(
             }
             commentsDialog.show(fragment.childFragmentManager, "CommentsDialog")
         }
+
+        // FirestoreからtimelineItem.challengeIdに対応するチャレンジ内容をクエリで取得
+        val challengeId = timelineItem.challengeId
+
+        // challengeコレクションから、challenge_idフィールドが一致するドキュメントを検索
+        val challengeRef = FirebaseFirestore.getInstance().collection("challenge")
+        challengeRef.whereEqualTo("challenge_id", challengeId)  // 数値のままクエリを実行
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val challengeDocument = querySnapshot.documents[0]  // 最初の一致するドキュメントを取得
+                    val challengeContent = challengeDocument.getString("challenge_content")
+                    holder.binding.challengeContentTextView.text = "チャレンジ内容: $challengeContent"
+                } else {
+                    holder.binding.challengeContentTextView.text = "チャレンジ内容: 不明"
+                }
+            }
+            .addOnFailureListener {
+                // クエリが失敗した場合のエラーハンドリング
+                holder.binding.challengeContentTextView.text = "チャレンジ内容: 取得に失敗しました"
+            }
 
         // コメント送信ボタンが押されたときの処理
         holder.binding.commentSendButton.setOnClickListener {

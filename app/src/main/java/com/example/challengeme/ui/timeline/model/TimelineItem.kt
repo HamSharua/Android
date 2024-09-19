@@ -8,5 +8,6 @@ data class TimelineItem(
     var likeCount: Long = 0,
     var commentCount: Long = 0,
     var isLiked: Boolean = false,
-    val datetime: com.google.firebase.Timestamp? = null  // 追加
+    val datetime: com.google.firebase.Timestamp? = null,
+    val challengeId: Long = 0L
 )
