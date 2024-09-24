@@ -31,7 +31,7 @@ class NotificationsAdapter(private var notifications: MutableList<NotificationIt
             .addOnSuccessListener { document ->
                 val userName = document.getString("user_name") ?: "Unknown"
                 if (notification.type == "like") {
-                    holder.binding.notificationText.text = "$userName があなたの投稿にいいねをしました"
+                    holder.binding.notificationText.text = "$userName があなたの投稿にリアクションしました"
                 } else if (notification.type == "comment") {
                     holder.binding.notificationText.text = "$userName があなたの投稿にコメントしました"
                 }
