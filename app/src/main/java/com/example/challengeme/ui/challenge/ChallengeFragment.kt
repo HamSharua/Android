@@ -28,6 +28,7 @@ class ChallengeFragment : Fragment() {
     private lateinit var challengeImage: ImageView
     private lateinit var challengeButton: Button
     private lateinit var changeChallengeButton: Button
+    private lateinit var resetButton: Button  // リセットボタンの追加
     private lateinit var remainingChangesTextView: TextView
     private lateinit var sharedPreferences: SharedPreferences
     private var selectedChallengeId: Long? = null
@@ -50,6 +51,7 @@ class ChallengeFragment : Fragment() {
         challengeImage = binding.challengeImage
         challengeButton = binding.btnChallenge
         changeChallengeButton = binding.btnChangeChallenge
+        resetButton = binding.btnReset  // リセットボタンのインスタンス
         remainingChangesTextView = binding.tvRemainingChanges
 
         updateRemainingChangesText() // 残り回数を表示
@@ -78,6 +80,14 @@ class ChallengeFragment : Fragment() {
             } else {
                 updateChangeChallengeButtonState() // ボタン状態を更新
             }
+        }
+
+        // リセットボタンを押した時の処理
+        resetButton.setOnClickListener {
+            resetChangeCount()  // 変更回数をリセット
+            updateRemainingChangesText()  // 表示を更新
+            updateChangeChallengeButtonState()  // ボタンの状態を更新
+            Toast.makeText(requireContext(), "残り回数がリセットされました", Toast.LENGTH_SHORT).show()
         }
 
         challengeButton.setOnClickListener {
@@ -158,9 +168,10 @@ class ChallengeFragment : Fragment() {
     }
 
     private fun resetChangeCount() {
+        // 残り回数をリセット
         sharedPreferences.edit()
-            .putString("last_change_date", getCurrentDate())
-            .putInt("change_count", 0)
+            .putInt("change_count", 0) // 回数をリセット
+            .putString("last_change_date", getCurrentDate()) // 日付もリセット
             .apply()
     }
 
